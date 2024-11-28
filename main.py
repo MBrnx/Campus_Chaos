@@ -12,7 +12,7 @@ pygame.mixer.music.load('images/BDD Niv_ax fond_audio.MP3')
 pygame.mixer.music.set_volume(0.5)  
 pygame.mixer.music.play(-1) 
 
-# Charger le son de collision (préchargé dans un tableau)
+# Charger le son de collision
 hit_sounds = [pygame.mixer.Sound('images/degats.MP3') for _ in range(5)]  # Précharger 5 sons
 hit_sound_index = 0  # Index pour suivre le prochain son disponible
 
@@ -30,10 +30,10 @@ pygame.display.set_caption("Chaos Campus")
 icon = pygame.image.load('images/Capture_d_écran_2024-11-05_à_16.06.34-removebg-preview.png')
 pygame.display.set_icon(icon)
 
-# Chronomètre de 120 secondes
-start_time = time.time()  # Moment où le jeu commence
-change_interval = 10  # Changer le fond toutes les 10 secondes
-total_time = 121  # 120 secondes au total
+# Chronomètre de 121 secondes
+start_time = time.time()  
+change_interval = 10  
+total_time = 121  
 
 # Liste des 12 images de fond
 backgrounds = [
@@ -70,7 +70,7 @@ def init_player():
     player = Player()
     background_height = background.get_height()
     player_height = player.image.get_height()
-    trottoir_y_position = background_height - 55  # Ajustez cette valeur si nécessaire
+    trottoir_y_position = background_height - 55  # Apparition ennemis
     player.rect.y = trottoir_y_position - player_height
     return player
 
@@ -79,7 +79,7 @@ def display_end_screen():
     font = pygame.font.Font(None, 74)
     running = True
     while running:
-        screen.fill((0, 0, 0))  # Fond noir
+        screen.fill((0, 0, 0))  
         game_over_text = font.render("Game Over", True, (255, 255, 255))
         retry_text = font.render("Réessayer (R)", True, (255, 255, 255))
         quit_text = font.render("Quitter (Q)", True, (255, 255, 255))
@@ -96,9 +96,9 @@ def display_end_screen():
                 pygame.quit()
                 return "quit"
             if event.type == pygame.KEYDOWN:
-                if event.key == pygame.K_r:  # Relancer
+                if event.key == pygame.K_r:  
                     return "retry"
-                if event.key == pygame.K_q:  # Quitter
+                if event.key == pygame.K_q: 
                     running = False
                     pygame.quit()
                     return "quit"
@@ -116,11 +116,11 @@ while True:
     while running:
         screen.blit(background, (0, 0))
 
-        # Vérifier combien de temps s'est écoulé
+        
         elapsed_time = time.time() - start_time
         remaining_time = total_time - elapsed_time
 
-        # Si le temps écoulé dépasse 120 secondes, arrêter les ennemis
+        
         if remaining_time <= 0:
             can_spawn_enemies = False
 
@@ -162,7 +162,7 @@ while True:
         for enemy in pygame.sprite.spritecollide(player, enemies, True):
             print("Collision avec un ennemi détectée !")
             player.health -= 10
-            play_hit_sound()  # Joue le son immédiatement après la collision
+            play_hit_sound()  
 
         if player.health <= 0:
             print("Le joueur n'a plus de vie. Fin du jeu.")
@@ -173,14 +173,14 @@ while True:
         player.draw_health_bar(screen)
 
         pygame.display.flip()
-        clock.tick(FPS)  # Limiter à FPS frames par seconde
+        clock.tick(FPS)  
 
-    # Afficher l'écran de fin
+    
     result = display_end_screen()
     if result == "retry":
         pygame.mixer.music.play(-1)
-        start_time = time.time()  # Réinitialiser le chrono
-        continue  # Relancer la boucle principale
+        start_time = time.time() 
+        continue  
     elif result == "quit":
         pygame.mixer.music.stop()
         break  # Quitter le jeu

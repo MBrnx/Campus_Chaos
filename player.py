@@ -9,7 +9,7 @@ class Player(pygame.sprite.Sprite):
         self.velocity = 3
         self.position_x = 250.0
         
-        # Charger les images pour l'animation
+        # Images pour l'animation
         self.images = [
             pygame.image.load('images/marche_1.png'),
             pygame.image.load('images/marche_2.png'),
@@ -19,7 +19,7 @@ class Player(pygame.sprite.Sprite):
         self.images = [pygame.transform.scale(img, (80, 100)) for img in self.images]
         self.image = self.images[0]
 
-        # Initialisation du rectangle
+       
         self.rect = self.image.get_rect()
         self.rect.x = int(self.position_x)
         self.image_index = 0
