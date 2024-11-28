@@ -138,3 +138,5 @@ while continuer:
                 continue  # Retour à l'écran d'accueil
 
 pygame.quit()
+
+#test
