@@ -149,11 +149,6 @@ while True:
         screen.blit(player.image, player.rect)
         player.draw_health_bar(screen)
 
-        # Afficher le temps restant
-        font = pygame.font.Font(None, 36)
-        timer_text = font.render(f"Temps restant: {int(remaining_time)}s", True, (255, 255, 255))
-        screen.blit(timer_text, (10, 10))
-
         pygame.display.flip()
         clock.tick(FPS)  # Limiter à FPS frames par seconde
 
