@@ -12,6 +12,16 @@ pygame.mixer.music.load('images/BDD Niv_ax fond_audio.MP3')
 pygame.mixer.music.set_volume(0.5)  
 pygame.mixer.music.play(-1) 
 
+# Charger le son de collision (préchargé dans un tableau)
+hit_sounds = [pygame.mixer.Sound('images/degats.MP3') for _ in range(5)]  # Précharger 5 sons
+hit_sound_index = 0  # Index pour suivre le prochain son disponible
+
+def play_hit_sound():
+    """Jouer un son de collision avec préchargement pour réduire la latence."""
+    global hit_sound_index
+    hit_sounds[hit_sound_index].play()
+    hit_sound_index = (hit_sound_index + 1) % len(hit_sounds)
+
 # Paramètres de la fenêtre
 screen = pygame.display.set_mode((SCREEN_WIDTH, SCREEN_HEIGHT))
 pygame.display.set_caption("Chaos Campus")
@@ -152,6 +162,7 @@ while True:
         for enemy in pygame.sprite.spritecollide(player, enemies, True):
             print("Collision avec un ennemi détectée !")
             player.health -= 10
+            play_hit_sound()  # Joue le son immédiatement après la collision
 
         if player.health <= 0:
             print("Le joueur n'a plus de vie. Fin du jeu.")
@@ -174,4 +185,4 @@ while True:
         pygame.mixer.music.stop()
         break  # Quitter le jeu
 
-    #oui
+
