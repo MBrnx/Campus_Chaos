@@ -114,6 +114,11 @@ while True:
         if remaining_time <= 0:
             can_spawn_enemies = False
 
+
+        if elapsed_time >= 121:
+            player.health = 100  
+            start_time = time.time()
+
         # Change le fond toutes les 10 secondes
         if int(elapsed_time) % change_interval == 0 and elapsed_time < total_time:
             new_background_path = backgrounds[(int(elapsed_time) // change_interval) % len(backgrounds)]

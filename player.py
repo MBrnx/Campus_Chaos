@@ -62,3 +62,4 @@ class Player(pygame.sprite.Sprite):
         pygame.draw.rect(screen, (255, 0, 0), (x_position, y_position, bar_width, bar_height))
         current_health_width = (self.health / self.max_health) * bar_width
         pygame.draw.rect(screen, (0, 255, 0), (x_position, y_position, current_health_width, bar_height))
+
