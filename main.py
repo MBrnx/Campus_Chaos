@@ -1,4 +1,5 @@
 import pygame
+import time
 from player import Player
 from enemy import Enemy
 from settings import SCREEN_HEIGHT, SCREEN_WIDTH, FPS
@@ -10,16 +11,44 @@ pygame.init()
 screen = pygame.display.set_mode((SCREEN_WIDTH, SCREEN_HEIGHT))
 pygame.display.set_caption("Chaos Campus")
 
-# Charger et redimensionner le fond d'écran
-background = pygame.image.load('images/Designer-2.jpg')
-background = pygame.transform.scale(background, (SCREEN_WIDTH, SCREEN_HEIGHT))
-
 # Charger l'icône du jeu
 icon = pygame.image.load('images/Capture_d_écran_2024-11-05_à_16.06.34-removebg-preview.png')
 pygame.display.set_icon(icon)
 
+# Chronomètre de 120 secondes
+start_time = time.time()  # Moment où le jeu commence
+change_interval = 10  # Changer le fond toutes les 10 secondes
+total_time = 120  # 120 secondes au total
+
+# Liste des 12 images de fond
+backgrounds = [
+    'images/a-0.JPEG',
+    'images/a-1.JPEG',
+    'images/a-2.JPEG',
+    'images/a-3.JPEG',
+    'images/a-4.JPEG',
+    'images/a-5.JPEG',
+    'images/a-6.JPEG',
+    'images/a-7.JPEG',
+    'images/a-8.JPEG',
+    'images/a-9.JPEG',
+    'images/a-10.JPEG',
+    'images/a-11.JPEG',
+    'images/a-12.JPEG',
+]
+
+background_index = 0
+background = pygame.image.load(backgrounds[background_index])
+background = pygame.transform.scale(background, (SCREEN_WIDTH, SCREEN_HEIGHT))
+
 # Initialiser l'horloge
 clock = pygame.time.Clock()
+
+def change_background(new_background_path):
+    """Change le fond pendant le jeu."""
+    new_background = pygame.image.load(new_background_path)
+    new_background = pygame.transform.scale(new_background, (SCREEN_WIDTH, SCREEN_HEIGHT))
+    return new_background
 
 def init_player():
     """Initialise le joueur et le place correctement."""
@@ -65,11 +94,27 @@ while True:
     player = init_player()
     enemies = pygame.sprite.Group()
     enemy_timer = 0
+    can_spawn_enemies = True
 
     # Boucle de jeu
     running = True
     while running:
         screen.blit(background, (0, 0))
+
+        # Vérifier combien de temps s'est écoulé
+        elapsed_time = time.time() - start_time
+        remaining_time = total_time - elapsed_time
+
+        # Si le temps écoulé dépasse 120 secondes, arrêter les ennemis
+        if remaining_time <= 0:
+            can_spawn_enemies = False
+
+        # Change le fond toutes les 10 secondes
+        if int(elapsed_time) % change_interval == 0 and elapsed_time < total_time:
+            new_background_path = backgrounds[(int(elapsed_time) // change_interval) % len(backgrounds)]
+            if new_background_path != backgrounds[background_index]:  # Si le fond change
+                background = change_background(new_background_path)
+                background_index = backgrounds.index(new_background_path)
 
         for event in pygame.event.get():
             if event.type == pygame.QUIT:
@@ -84,7 +129,7 @@ while True:
             player.move('left', SCREEN_WIDTH)
 
         enemy_timer += 1
-        if enemy_timer > 5:
+        if enemy_timer > 60 and can_spawn_enemies:
             enemies.add(Enemy(SCREEN_WIDTH))
             enemy_timer = 0
 
@@ -104,15 +149,23 @@ while True:
         screen.blit(player.image, player.rect)
         player.draw_health_bar(screen)
 
+        # Afficher le temps restant
+        font = pygame.font.Font(None, 36)
+        timer_text = font.render(f"Temps restant: {int(remaining_time)}s", True, (255, 255, 255))
+        screen.blit(timer_text, (10, 10))
+
         pygame.display.flip()
         clock.tick(FPS)  # Limiter à FPS frames par seconde
 
     # Afficher l'écran de fin
     result = display_end_screen()
     if result == "retry":
+        start_time = time.time()  # Réinitialiser le chrono
         continue  # Relancer la boucle principale
     elif result == "quit":
         break  # Quitter le jeu
+
+
 
 
 
