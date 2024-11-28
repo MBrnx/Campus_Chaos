@@ -15,7 +15,7 @@ pygame.mixer.music.play(0)
 
 # Charger le son de collision
 sons_de_hit = [pygame.mixer.Sound('images/degats.MP3') for _ in range(5)]  # Précharger 5 sons
-index_son_hit = 0  # Index pour suivre le prochain son disponible
+index_son_hit = 0  
 
 def jouer_son_de_hit():
     """Jouer un son de collision avec préchargement pour réduire la latence."""
@@ -57,10 +57,10 @@ index_fond = 0
 fond = pygame.image.load(fonds[index_fond])
 fond = pygame.transform.scale(fond, (SCREEN_WIDTH, SCREEN_HEIGHT))
 
-# Charger l'image du portail
+
 image_portail = pygame.image.load('images/Portail.png')
-# Agrandir la taille du portail
-image_portail = pygame.transform.scale(image_portail, (150, 150))  # Taille plus grande
+
+image_portail = pygame.transform.scale(image_portail, (150, 150)) 
 rect_portail = image_portail.get_rect()
 
 # Initialiser l'horloge
@@ -77,7 +77,7 @@ def init_joueur():
     joueur = Player()
     hauteur_fond = fond.get_height()
     hauteur_joueur = joueur.image.get_height()
-    position_trottoir_y = hauteur_fond - 55  # Apparition ennemis
+    position_trottoir_y = hauteur_fond - 55  
     joueur.rect.y = position_trottoir_y - hauteur_joueur
     return joueur
 
@@ -97,7 +97,7 @@ def afficher_message_felicitation():
         x_pos1 = SCREEN_WIDTH // 2 - texte_part1.get_width() // 2
         x_pos2 = SCREEN_WIDTH // 2 - texte_part2.get_width() // 2
 
-        # Centrer les lignes verticalement (ajustement)
+        # Centrer les lignes verticalement 
         ecran.blit(texte_part1, (x_pos1, 150))
         ecran.blit(texte_part2, (x_pos2, 210))
         ecran.blit(texte_quitter, (SCREEN_WIDTH // 2 - texte_quitter.get_width() // 2, 300))
