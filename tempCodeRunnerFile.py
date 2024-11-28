@@ -23,7 +23,7 @@ pygame.display.set_icon(icon)
 # Chronomètre de 120 secondes
 start_time = time.time()  # Moment où le jeu commence
 change_interval = 10  # Changer le fond toutes les 10 secondes
-total_time = 12  # 120 secondes au total
+total_time = 121  # 120 secondes au total
 
 # Liste des 12 images de fond
 backgrounds = [
