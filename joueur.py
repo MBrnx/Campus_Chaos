@@ -18,6 +18,8 @@ class Joueur(pygame.sprite.Sprite):
         self.tir_autorise = 1
         self.direction = 1
 
+        self.vie = 2
+
         self.image_joueur = pygame.image.load('image/personnage.png')
 
         self.joueur_debout = [pygame.Rect(84, 29, 92, 136)]
@@ -121,3 +123,22 @@ class Joueur(pygame.sprite.Sprite):
         dico['attaque'] = self.joueur_tir
 
         return dico
+    
+    def afficher_vie(self, surface):
+        """Affiche la barre de vie du joueur en bas à gauche."""
+        # Dimensions de la barre de vie
+        largeur_barre = 100
+        hauteur_barre = 10
+        marge = 10
+            
+        # Couleur de la barre de vie
+        couleur_fond = (255, 0, 0)  # Rouge pour le fond
+        couleur_vie = (0, 255, 0)   # Vert pour la vie restante
+            
+        # Dessiner le fond de la barre de vie
+        pygame.draw.rect(surface, couleur_fond, (marge, surface.get_height() - hauteur_barre - marge, largeur_barre, hauteur_barre))
+            
+        # Dessiner la vie restante
+        vie_restante = int((self.vie / 2) * largeur_barre)  # Calculer la largeur de la barre de vie
+        pygame.draw.rect(surface, couleur_vie, (marge, surface.get_height() - hauteur_barre - marge, vie_restante, hauteur_barre))
+
