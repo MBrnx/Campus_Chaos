@@ -5,7 +5,7 @@ import os
 # Importation des différents niveau du jeu 
 from niveau1 import niveau1
 from niveau2 import niveau2
-from niveau3 import niveau3 
+from main import niveauAxel
 
 # Importation de bouton
 from bouton import Bouton
@@ -66,17 +66,20 @@ while continuer:
             if bouton1.is_clicked(souris_pos):
                 result = niveau1(fen, score_niveau1)
                 if isinstance(result, int):
-                    score_niveau1 = result
+                    score_niveau1 = result 
             elif bouton2.is_clicked(souris_pos):
                 if score_niveau1 >= 5:  # Condition pour débloquer le niveau 2
                     result = niveau2(fen, score_niveau2)
                     if isinstance(result, int):
                         score_niveau2 = result
             elif bouton3.is_clicked(souris_pos):
-                if score_niveau2 >= 5:  # Condition pour débloquer le niveau 3
-                    result = niveau3(fen, score_niveau3)
-                    if isinstance(result, int):
-                        score_niveau2 = result
+                result = niveauAxel(fen, score_niveau1)
+                if result == "reessayer":
+                    continue
+                elif result == "quitter":
+                    continuer = False
+                elif isinstance(result, int):
+                    score_niveau1 = result
 
     # Afficher les messages de verrouillage des niveaux
     font = pygame.font.Font(None, 24)
@@ -88,8 +91,6 @@ while continuer:
         fen.blit(text, (200, 550))
         
     if jeu_en_cours:
-        # Lors du clic sur les boutons, assurez-vous de passer le score en paramètre pour chaque niveau
-        
         # Niveau 1
         if bouton1.is_clicked(souris_pos): 
             result = niveau1(fen, score_niveau1)  # Passer le score actuel
@@ -110,7 +111,7 @@ while continuer:
         # Niveau 3 
         elif bouton2.is_clicked(souris_pos):
             if score_niveau2 >= 5:
-                result = niveau3(fen, score_niveau2)  # Passer le score actuel
+                result = niveauAxel(fen, score_niveau2)  # Passer le score actuel
                 if result == "menu":
                     jeu_en_cours = False  # Retour au menu principal
                 else:
