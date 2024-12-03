@@ -57,7 +57,6 @@ index_fond = 0
 fond = pygame.image.load(fonds[index_fond])
 fond = pygame.transform.scale(fond, (SCREEN_WIDTH, SCREEN_HEIGHT))
 
-
 image_portail = pygame.image.load('images/Portail.png')
 
 image_portail = pygame.transform.scale(image_portail, (150, 150)) 
@@ -81,26 +80,19 @@ def init_joueur():
     joueur.rect.y = position_trottoir_y - hauteur_joueur
     return joueur
 
-def afficher_message_felicitation():
-    """Affiche le message de félicitations à la fin du jeu."""
+def afficher_message(message, couleur):
+    """Affiche un message générique à la fin du jeu."""
     police = pygame.font.Font(None, 50)
     en_cours = True
     while en_cours:
         ecran.fill((0, 0, 0))  
-        
-        # Diviser le message en deux parties
-        texte_part1 = police.render("Félicitations ! En empruntant ce portail,", True, (255, 255, 255))
-        texte_part2 = police.render("vous avez réussi à sortir de ce cauchemar !", True, (255, 255, 255))
-        texte_quitter = police.render("Finir le jeu. (Q)", True, (255, 255, 255))
+        texte = police.render(message, True, couleur)
+        texte_quitter = police.render("Appuyez sur Q pour quitter.", True, (255, 255, 255))
+        texte_reessayer = police.render("Appuyez sur R pour réessayer.", True, (255, 255, 255))
 
-        # Calculer la position pour centrer chaque ligne
-        x_pos1 = SCREEN_WIDTH // 2 - texte_part1.get_width() // 2
-        x_pos2 = SCREEN_WIDTH // 2 - texte_part2.get_width() // 2
-
-        # Centrer les lignes verticalement 
-        ecran.blit(texte_part1, (x_pos1, 150))
-        ecran.blit(texte_part2, (x_pos2, 210))
+        ecran.blit(texte, (SCREEN_WIDTH // 2 - texte.get_width() // 2, 150))
         ecran.blit(texte_quitter, (SCREEN_WIDTH // 2 - texte_quitter.get_width() // 2, 300))
+        ecran.blit(texte_reessayer, (SCREEN_WIDTH // 2 - texte_reessayer.get_width() // 2, 400))
 
         pygame.display.flip()
 
@@ -114,6 +106,8 @@ def afficher_message_felicitation():
                     en_cours = False
                     pygame.quit()
                     return "quitter"
+                if event.key == pygame.K_r:
+                    return "reessayer"
 
 def spawn_portail():
     rect_portail.x = random.randint(0, SCREEN_WIDTH - rect_portail.width)
@@ -131,15 +125,15 @@ while True:
 
     # Boucle de jeu
     en_cours = True
+    victoire = False  # Indicateur de victoire ou défaite
+
     while en_cours:
         ecran.blit(fond, (0, 0))
 
         temps_ecoule = time.time() - temps_debut
         temps_restant = temps_total - temps_ecoule
 
-        
         if temps_ecoule >= 121:
-            
             if portail is None:
                 portail = spawn_portail()  
             peut_spawner_ennemis = False  
@@ -182,12 +176,13 @@ while True:
         if joueur.health <= 0:
             print("Le joueur n'a plus de vie. Fin du jeu.")
             en_cours = False
+            victoire = False
 
         # Vérifier la collision avec le portail si il est activé
         if portail and joueur.rect.colliderect(portail):
             print("Le joueur a touché le portail !")
-            afficher_message_felicitation()  
-            en_cours = False  # Terminer le jeu
+            en_cours = False
+            victoire = True
 
         joueur.update()
         ecran.blit(joueur.image, joueur.rect)
@@ -200,10 +195,22 @@ while True:
         pygame.display.flip()
         horloge.tick(FPS)
 
-    # Afficher l'écran de fin
-    resultat = afficher_message_felicitation()
+    # Afficher le résultat
+    if victoire:
+        resultat = afficher_message("Félicitations ! Vous avez réussi à sortir de ce cauchemar !", (0, 255, 0))
+    else:
+        resultat = afficher_message("Vous avez perdu. Réessayez !", (255, 0, 0))
+
     if resultat == "quitter":
         pygame.mixer.music.stop()
-        break  # Quitter le jeu
+        break
+        break
+    elif resultat == "reessayer":
+        pygame.mixer.music.stop()
+        pygame.mixer.music.play(0)
+        temps_debut = time.time()  # Réinitialiser le chronomètre
+        continue
+
+
 
 
