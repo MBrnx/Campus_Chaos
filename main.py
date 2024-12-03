@@ -1,157 +1,140 @@
 import pygame
 import time
 import random
+import os
 from player import Player
 from enemy import Enemy
 from settings import SCREEN_HEIGHT, SCREEN_WIDTH, FPS
 
-# Initialisation de Pygame
-pygame.init()
+def niveauAxel(fen, score_initial):
+    """Fonction pour exécuter le niveau 1."""
+    #pygame.mixer.init()
+    #pygame.mixer.music.load('images/BDD Niv_ax fond_audio.MP3') 
+    #pygame.mixer.music.set_volume(0.5)  
+    #pygame.mixer.music.play(0) 
 
-pygame.mixer.init()
-pygame.mixer.music.load('images/BDD Niv_ax fond_audio.MP3') 
-pygame.mixer.music.set_volume(0.5)  
-pygame.mixer.music.play(0) 
+    #sons_de_hit = [pygame.mixer.Sound('images/degats.MP3') for _ in range(5)]
+    #index_son_hit = 0  
 
-# Charger le son de collision
-sons_de_hit = [pygame.mixer.Sound('images/degats.MP3') for _ in range(5)]  # Précharger 5 sons
-index_son_hit = 0  
+    #def jouer_son_de_hit():
+    #    """Jouer un son de collision avec préchargement pour réduire la latence."""
+    #    nonlocal index_son_hit
+    #    sons_de_hit[index_son_hit].play()
+    #    index_son_hit = (index_son_hit + 1) % len(sons_de_hit)
+    
+    image_portail = pygame.image.load(os.path.join("/Users/mathisbruniaux/Desktop/Informatique/L2 informatique 2024-2025/S1/dev app/Projet/Projet/images/Portail.png"))
+    image_portail = pygame.transform.scale(image_portail, (150, 150)) 
+    rect_portail = image_portail.get_rect()
 
-def jouer_son_de_hit():
-    """Jouer un son de collision avec préchargement pour réduire la latence."""
-    global index_son_hit
-    sons_de_hit[index_son_hit].play()
-    index_son_hit = (index_son_hit + 1) % len(sons_de_hit)
+    # Liste des 12 images de fond
+    fondsA = [
+        "/Users/mathisbruniaux/Desktop/Informatique/L2 informatique 2024-2025/S1/dev app/Projet/Projet/images/a-0.JPEG",
+        "/Users/mathisbruniaux/Desktop/Informatique/L2 informatique 2024-2025/S1/dev app/Projet/Projet/images/a-1.JPEG",
+        "/Users/mathisbruniaux/Desktop/Informatique/L2 informatique 2024-2025/S1/dev app/Projet/Projet/images/a-2.JPEG",
+        "/Users/mathisbruniaux/Desktop/Informatique/L2 informatique 2024-2025/S1/dev app/Projet/Projet/images/a-3.JPEG",
+        "/Users/mathisbruniaux/Desktop/Informatique/L2 informatique 2024-2025/S1/dev app/Projet/Projet/images/a-4.JPEG",
+        "/Users/mathisbruniaux/Desktop/Informatique/L2 informatique 2024-2025/S1/dev app/Projet/Projet/images/a-5.JPEG",
+        "/Users/mathisbruniaux/Desktop/Informatique/L2 informatique 2024-2025/S1/dev app/Projet/Projet/images/a-6.JPEG",
+        "/Users/mathisbruniaux/Desktop/Informatique/L2 informatique 2024-2025/S1/dev app/Projet/Projet/images/a-7.JPEG",
+        "/Users/mathisbruniaux/Desktop/Informatique/L2 informatique 2024-2025/S1/dev app/Projet/Projet/images/a-8.JPEG",
+        "/Users/mathisbruniaux/Desktop/Informatique/L2 informatique 2024-2025/S1/dev app/Projet/Projet/images/a-9.JPEG",
+        "/Users/mathisbruniaux/Desktop/Informatique/L2 informatique 2024-2025/S1/dev app/Projet/Projet/images/a-10.JPEG",
+        "/Users/mathisbruniaux/Desktop/Informatique/L2 informatique 2024-2025/S1/dev app/Projet/Projet/images/a-11.JPEG",
+        "/Users/mathisbruniaux/Desktop/Informatique/L2 informatique 2024-2025/S1/dev app/Projet/Projet/images/a-12.JPEG",
+    ]
+    
+    index_fond = 0
+    fondA = pygame.image.load(fondsA[index_fond])
+    fondA = pygame.transform.scale(fondA, (SCREEN_WIDTH, SCREEN_HEIGHT))
 
-# Paramètres de la fenêtre
-ecran = pygame.display.set_mode((SCREEN_WIDTH, SCREEN_HEIGHT))
-pygame.display.set_caption("Chaos Campus")
+    def changer_fond(nouveau_fond_path):
+        """Changer le fond pendant le jeu."""
+        nouveau_fond = pygame.image.load(nouveau_fond_path)
+        nouveau_fond = pygame.transform.scale(nouveau_fond, (SCREEN_WIDTH, SCREEN_HEIGHT))
+        return nouveau_fond
 
-# Charger l'icône du jeu
-icone = pygame.image.load('images/Capture_d_écran_2024-11-05_à_16.06.34-removebg-preview.png')
-pygame.display.set_icon(icone)
+    def init_joueur():
+        """Initialise le joueur et le place correctement."""
+        joueur = Player()
+        hauteur_fond = fondA.get_height()
+        hauteur_joueur = joueur.image.get_height()
+        position_trottoir_y = hauteur_fond - 55  
+        joueur.rect.y = position_trottoir_y - hauteur_joueur
+        return joueur
 
-# Chronomètre de 121 secondes
-temps_debut = time.time()  
-intervalle_changement = 10  
-temps_total = 121  
+    def afficher_message(message, couleur):
+        """Affiche un message générique à la fin du jeu."""
+        police = pygame.font.Font(None, 50)
+        while True:
+            fen.fill((0, 0, 0))  
+            texte = police.render(message, True, couleur)
+            texte_quitter = police.render("Appuyez sur Q pour quitter.", True, (255, 255, 255))
+            texte_reessayer = police.render("Appuyez sur R pour réessayer.", True, (255, 255, 255))
 
-# Liste des 12 images de fond
-fonds = [
-    'images/a-0.JPEG',
-    'images/a-1.JPEG',
-    'images/a-2.JPEG',
-    'images/a-3.JPEG',
-    'images/a-4.JPEG',
-    'images/a-5.JPEG',
-    'images/a-6.JPEG',
-    'images/a-7.JPEG',
-    'images/a-8.JPEG',
-    'images/a-9.JPEG',
-    'images/a-10.JPEG',
-    'images/a-11.JPEG',
-    'images/a-12.JPEG',
-]
+            fen.blit(texte, (SCREEN_WIDTH // 2 - texte.get_width() // 2, 150))
+            fen.blit(texte_quitter, (SCREEN_WIDTH // 2 - texte_quitter.get_width() // 2, 300))
+            fen.blit(texte_reessayer, (SCREEN_WIDTH // 2 - texte_reessayer.get_width() // 2, 400))
 
-index_fond = 0
-fond = pygame.image.load(fonds[index_fond])
-fond = pygame.transform.scale(fond, (SCREEN_WIDTH, SCREEN_HEIGHT))
+            pygame.display.flip()
 
-image_portail = pygame.image.load('images/Portail.png')
+            for event in pygame.event.get():
+                if event.type == pygame.QUIT:
+                    return "quitter"
+                if event.type == pygame.KEYDOWN:
+                    if event.key == pygame.K_q: 
+                        return "quitter"
+                    if event.key == pygame.K_r:
+                        return "reessayer"
 
-image_portail = pygame.transform.scale(image_portail, (150, 150)) 
-rect_portail = image_portail.get_rect()
+    joueur = init_joueur()
+    ennemis = pygame.sprite.Group()
+    timer_ennemi = 0
+    peut_spawner_ennemis = True
+    portail = None  
+    temps_debut = time.time()
+    temps_total = 121
+    intervalle_changement = 10
+    index_fond = 0
+    score = 0
+    fondA = changer_fond(fondsA[index_fond])
 
-# Initialiser l'horloge
-horloge = pygame.time.Clock()
-
-def changer_fond(nouveau_fond_path):
-    """Changer le fond pendant le jeu."""
-    nouveau_fond = pygame.image.load(nouveau_fond_path)
-    nouveau_fond = pygame.transform.scale(nouveau_fond, (SCREEN_WIDTH, SCREEN_HEIGHT))
-    return nouveau_fond
-
-def init_joueur():
-    """Initialise le joueur et le place correctement."""
-    joueur = Player()
-    hauteur_fond = fond.get_height()
-    hauteur_joueur = joueur.image.get_height()
-    position_trottoir_y = hauteur_fond - 55  
-    joueur.rect.y = position_trottoir_y - hauteur_joueur
-    return joueur
-
-def afficher_message(message, couleur):
-    """Affiche un message générique à la fin du jeu."""
-    police = pygame.font.Font(None, 50)
     en_cours = True
+    victoire = False  # Indicateur de victoire ou défaite
+    
+    def spawn_portail():
+        rect_portail.x = random.randint(0, SCREEN_WIDTH - rect_portail.width)
+        rect_portail.y = SCREEN_HEIGHT - rect_portail.height - 55 
+        return rect_portail
+
     while en_cours:
-        ecran.fill((0, 0, 0))  
-        texte = police.render(message, True, couleur)
-        texte_quitter = police.render("Appuyez sur Q pour quitter.", True, (255, 255, 255))
-        texte_reessayer = police.render("Appuyez sur R pour réessayer.", True, (255, 255, 255))
+        for event in pygame.event.get():
+            if event.type == pygame.QUIT:
+                return score
+            if event.type == pygame.KEYDOWN:
+                if event.key == pygame.K_ESCAPE:
+                    return score
 
-        ecran.blit(texte, (SCREEN_WIDTH // 2 - texte.get_width() // 2, 150))
-        ecran.blit(texte_quitter, (SCREEN_WIDTH // 2 - texte_quitter.get_width() // 2, 300))
-        ecran.blit(texte_reessayer, (SCREEN_WIDTH // 2 - texte_reessayer.get_width() // 2, 400))
+        fen.blit(fondA, (0, 0))
 
-        pygame.display.flip()
+        temps_ecoule = time.time() - temps_debut
+        #temps_restant = temps_total - temps_ecoule
+
+        if temps_ecoule >= temps_total:
+            if portail is None:
+                portail = pygame.Rect(random.randint(0, SCREEN_WIDTH - 150), SCREEN_HEIGHT - 205, 150, 150)
+            peut_spawner_ennemis = False  
+
+        if int(temps_ecoule) % intervalle_changement == 0:
+            nouveau_fond_path = fondsA[(int(temps_ecoule) // intervalle_changement) % len(fondsA)]
+            if nouveau_fond_path != fondsA[index_fond]:  
+                fondA = changer_fond(nouveau_fond_path)
+                index_fond = fondsA.index(nouveau_fond_path)
 
         for event in pygame.event.get():
             if event.type == pygame.QUIT:
                 en_cours = False
                 pygame.quit()
                 return "quitter"
-            if event.type == pygame.KEYDOWN:
-                if event.key == pygame.K_q: 
-                    en_cours = False
-                    pygame.quit()
-                    return "quitter"
-                if event.key == pygame.K_r:
-                    return "reessayer"
-
-def spawn_portail():
-    rect_portail.x = random.randint(0, SCREEN_WIDTH - rect_portail.width)
-    rect_portail.y = SCREEN_HEIGHT - rect_portail.height - 55 
-    return rect_portail
-
-# Boucle principale
-while True:
-    # Initialiser le joueur et les ennemis
-    joueur = init_joueur()
-    ennemis = pygame.sprite.Group()
-    timer_ennemi = 0
-    peut_spawner_ennemis = True
-    portail = None  
-
-    # Boucle de jeu
-    en_cours = True
-    victoire = False  # Indicateur de victoire ou défaite
-
-    while en_cours:
-        ecran.blit(fond, (0, 0))
-
-        temps_ecoule = time.time() - temps_debut
-        temps_restant = temps_total - temps_ecoule
-
-        if temps_ecoule >= 121:
-            if portail is None:
-                portail = spawn_portail()  
-            peut_spawner_ennemis = False  
-
-        # Change le fond toutes les 10 secondes
-        if int(temps_ecoule) % intervalle_changement == 0 and temps_ecoule < temps_total:
-            nouveau_fond_path = fonds[(int(temps_ecoule) // intervalle_changement) % len(fonds)]
-            if nouveau_fond_path != fonds[index_fond]:  
-                fond = changer_fond(nouveau_fond_path)
-                index_fond = fonds.index(nouveau_fond_path)
-
-        for event in pygame.event.get():
-            if event.type == pygame.QUIT:
-                pygame.mixer.music.stop()
-                pygame.quit()
-                en_cours = False
-                pygame.quit()
-                break
 
         touches = pygame.key.get_pressed()
         if touches[pygame.K_d]:
@@ -166,51 +149,32 @@ while True:
 
         ennemis.update()
         for ennemi in ennemis:
-            ecran.blit(ennemi.image, ennemi.rect)
+            fen.blit(ennemi.image, ennemi.rect)
 
         for ennemi in pygame.sprite.spritecollide(joueur, ennemis, True):
-            print("Collision avec un ennemi détectée !")
             joueur.health -= 10
-            jouer_son_de_hit()
+            #jouer_son_de_hit()
 
         if joueur.health <= 0:
-            print("Le joueur n'a plus de vie. Fin du jeu.")
             en_cours = False
             victoire = False
 
-        # Vérifier la collision avec le portail si il est activé
         if portail and joueur.rect.colliderect(portail):
-            print("Le joueur a touché le portail !")
             en_cours = False
             victoire = True
 
         joueur.update()
-        ecran.blit(joueur.image, joueur.rect)
-        joueur.draw_health_bar(ecran)
+        fen.blit(joueur.image, joueur.rect)
+        joueur.draw_health_bar(fen)
 
-        # Afficher le portail uniquement après 121 secondes
         if portail:
-            ecran.blit(image_portail, portail)
+            fen.blit(image_portail, (portail.x, portail.y))
 
         pygame.display.flip()
-        horloge.tick(FPS)
+        pygame.time.Clock().tick(FPS)
 
-    # Afficher le résultat
     if victoire:
-        resultat = afficher_message("Félicitations ! Vous avez réussi à sortir de ce cauchemar !", (0, 255, 0))
+        return afficher_message("Félicitations ! Vous avez réussi !", (0, 255, 0))
     else:
-        resultat = afficher_message("Vous avez perdu. Réessayez !", (255, 0, 0))
-
-    if resultat == "quitter":
-        pygame.mixer.music.stop()
-        break
-        break
-    elif resultat == "reessayer":
-        pygame.mixer.music.stop()
-        pygame.mixer.music.play(0)
-        temps_debut = time.time()  # Réinitialiser le chronomètre
-        continue
-
-
-
-
+        return afficher_message("Vous avez perdu. Réessayez !", (255, 0, 0))
+    
