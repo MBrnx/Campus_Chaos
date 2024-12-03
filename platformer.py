@@ -1,8 +1,6 @@
 import pygame
 import sys
 import os
-from plt2 import charger_image
-
 # Initialisation de Pygame
 pygame.init()
 
@@ -102,11 +100,11 @@ def jeu_principal():
                 jeu_en_cours = False
 
         touches = pygame.key.get_pressed()
-        if touches[pygame.K_LEFT] and joueur_x > 0:
+        if touches[pygame.K_q] and joueur_x > 0:
             joueur_x -= joueur_vitesse_x
-        if touches[pygame.K_RIGHT]:
+        if touches[pygame.K_d]:
             joueur_x += joueur_vitesse_x
-        if touches[pygame.K_UP] and sur_sol:
+        if touches[pygame.K_z] and sur_sol:
             joueur_vitesse_y = saut_puissance
             sur_sol = False
 
