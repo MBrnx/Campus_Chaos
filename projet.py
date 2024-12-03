@@ -91,6 +91,8 @@ while continuer:
         fen.blit(text, (200, 550))
         
     if jeu_en_cours:
+        # Lors du clic sur les boutons, assurez-vous de passer le score en paramètre pour chaque niveau
+        
         # Niveau 1
         if bouton1.is_clicked(souris_pos): 
             result = niveau1(fen, score_niveau1)  # Passer le score actuel
