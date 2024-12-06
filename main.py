@@ -10,10 +10,23 @@ from ennemie import Ennemie
 class Jeu:
 
     def __init__(self):
+
+        # Initialiser pygame et le mixer
+        pygame.init()
+        pygame.mixer.init()
+
+        # Charger les fichiers sonores
+        son_ambiance = pygame.mixer.Sound('son/ambiance.wav')
+        son_ambiance.play(-1)
+        self.son_tir = pygame.mixer.Sound('son/tir.wav')
+        self.son_jump = pygame.mixer.Sound('son/jump.wav')
+        self.son_tir.set_volume(0.1)
+
         # Initialisation de l'écran
         self.ecran = pygame.display.set_mode((1100, 600))
         pygame.display.set_caption("Chaos Campus")
         self.jeu_encours = True
+
 
         # Chargement de l'image du fond
         self.image_background = pygame.image.load('image/back.jpeg').convert()
@@ -63,9 +76,32 @@ class Jeu:
         self.invincibilite_temps = 0
         self.duree_invincibilite = 2  # 2 secondes d'invincibilité après un coup
 
+        # Charger l'image du trophée
+        self.image_trophee = pygame.image.load('image/trophee.png').subsurface((0, 0, 500, 500))
+        self.image_trophee = pygame.transform.scale(self.image_trophee, (100, 100))  # Redimensionner le trophée à une taille raisonnable
+        self.trophee_position = (500, 380)  # Position en bas à droite, légèrement décalée du bord
+        self.trophee_affiche = False  # Flag pour savoir si le trophée doit être affiché
+
+        # Rectangle pour détecter la collision avec le trophée
+        self.trophee_rect = pygame.Rect(self.trophee_position[0], self.trophee_position[1], 100, 100)
+
+        # Initialisation des plateformes une seule fois
+        self.platforme_groupe = Group()
+        for rectangle in self.platforme_liste_rect:
+            platforme = Platforme(rectangle)
+            self.platforme_groupe.add(platforme)
+
+    def jouer_tir(self):
+        self.son_tir.play()
+
+    def jouer_jump(self):
+        self.son_jump.play()
+
+
+
     def spawn_ennemi(self):
-        """Faire apparaître un ennemi toutes les 5 secondes, jusqu'à un total de 5 ennemis."""
-        if self.ennemi_count < 5 and time.time() - self.ennemi_spawn_time >= 5:
+        """Faire apparaître un ennemi toutes les 3 secondes, jusqu'à un total de 4 ennemis."""
+        if self.ennemi_count < 4 and time.time() - self.ennemi_spawn_time >= 3:
             direction = 1 if self.ennemi_count % 2 == 0 else -1  # Alternance de direction
             ennemi = Ennemie(500, 5, self.taille, self.platforme_groupe)
             ennemi.direction = direction
@@ -82,7 +118,7 @@ class Jeu:
     def afficher_ennemis_tues(self):
         """Affiche le nombre d'ennemis tués."""
         font = pygame.font.Font(None, 36)  # Police par défaut, taille 36
-        texte = f"{self.ennemis_tues}/5"
+        texte = f"{self.ennemis_tues}/4"
         surface_texte = font.render(texte, True, (255, 0, 0))  # Texte en rouge
         self.ecran.blit(surface_texte, (self.ecran.get_width() - 100, self.ecran.get_height() - 40))
 
@@ -221,10 +257,12 @@ class Jeu:
                             self.joueur.a_sauter = True
                             self.joueur.nombre_de_saut += 1
                             self.joueur.etat = 'saut'
+                            self.jouer_jump()
 
                     if event.key == pygame.K_p:
                         self.t = time.time()
                         self.joueur.etat = 'attaque'
+                        self.jouer_tir()
 
                 if event.type == pygame.KEYUP:
                     if event.key == pygame.K_d or event.key == pygame.K_q:
@@ -259,11 +297,11 @@ class Jeu:
                     self.projectile_groupe.remove(projectile)
 
             for rectangle in self.platforme_liste_rect:
-                platforme = Platforme(rectangle)
-                self.platforme_groupe.add(platforme)
+                platforme = Platforme(rectangle)  # Cette ligne ne doit pas être répétée dans la boucle
                 if self.joueur.rect.midbottom[1] // 10 * 10 == platforme.rect.top and self.joueur.rect.colliderect(rectangle):
                     self.resistance = (0, -10)
                     self.joueur.nombre_de_saut = 0
+
 
             self.delta_temps = self.t2 - self.t1
             self.joueur.mouvement(self.joueur_vitesse_x)
@@ -304,6 +342,29 @@ class Jeu:
 
             self.verifier_collision_ennemi()
             self.verifier_invincibilite()
+
+            # Vérifier si tous les ennemis sont tués pour afficher le trophée
+            if self.ennemis_tues == 4:
+                self.trophee_affiche = True
+
+            if self.trophee_affiche:
+                self.ecran.blit(self.image_trophee, self.trophee_position)
+            
+            # Vérifier si le joueur est proche du trophée
+            if self.trophee_affiche and self.joueur.rect.colliderect(self.trophee_rect):
+                # Afficher le texte d'instruction
+                font = pygame.font.Font(None, 36)  # Police par défaut, taille 36
+                texte_instruction = "Appuyez sur E pour finir le niveau"
+                surface_texte = font.render(texte_instruction, True, (255, 255, 255))  # Texte en blanc
+                x_text = self.trophee_position[0] + self.trophee_rect.width // 2 - surface_texte.get_width() // 2
+                y_text = self.trophee_position[1] - 40
+                self.ecran.blit(surface_texte, (x_text, y_text))
+
+                # Vérifier si le joueur appuie sur E
+                if event.type == pygame.KEYDOWN and event.key == pygame.K_e:
+                    self.menu()  
+
+
 
             pygame.draw.rect(self.ecran, (255, 0, 0), self.rect, 1)
             self.horloge.tick(self.fps)
