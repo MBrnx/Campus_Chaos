@@ -11,7 +11,7 @@ class Ennemie(pygame.sprite.Sprite):
         self.rect = pygame.Rect(self.x, self.y, self.taille[0], self.taille[1])
 
         # Charger l'image de l'ennemi
-        self.image_ennemi = pygame.image.load('image/personnage.png').convert_alpha()
+        self.image_ennemi = pygame.image.load("Desktop/Projet/images/personnage.png").convert_alpha()
 
         # Liste des frames pour l'animation
         frames = [
