@@ -20,7 +20,7 @@ class Joueur(pygame.sprite.Sprite):
 
         self.vie = 2
 
-        self.image_joueur = pygame.image.load('image/personnage.png')
+        self.image_joueur = pygame.image.load("Desktop/Projet/images/personnage.png")
 
         self.joueur_debout = [pygame.Rect(84, 29, 92, 136)]
 
