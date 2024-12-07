@@ -7,7 +7,7 @@ from projectiles import Projectile
 from platforme import Platforme
 from ennemie import Ennemie
 
-class Jeu:
+class NiveauBastien:
 
     def __init__(self):
 
@@ -16,20 +16,19 @@ class Jeu:
         pygame.mixer.init()
 
         # Charger les fichiers sonores
-        son_ambiance = pygame.mixer.Sound('son/ambiance.wav')
+        son_ambiance = pygame.mixer.Sound('Desktop/Projet/son/ambiance.wav')
         son_ambiance.play(-1)
-        self.son_tir = pygame.mixer.Sound('son/tir.wav')
-        self.son_jump = pygame.mixer.Sound('son/jump.wav')
+        self.son_tir = pygame.mixer.Sound('Desktop/Projet/son/tir.wav')
+        self.son_jump = pygame.mixer.Sound('Desktop/Projet/son/jump.wav')
         self.son_tir.set_volume(0.1)
 
-        # Initialisation de l'écran
+       # Initialisation de l'écran
         self.ecran = pygame.display.set_mode((1100, 600))
-        pygame.display.set_caption("Chaos Campus")
+        pygame.display.set_caption("Chaos Campus Niveau Bastien")
         self.jeu_encours = True
 
-
         # Chargement de l'image du fond
-        self.image_background = pygame.image.load('image/back.jpeg').convert()
+        self.image_background = pygame.image.load('Desktop/Projet/images/back.jpeg').convert()
 
         # Définition des rectangles pour l'arrière-plan et le sol
         self.rect_arriere_plan = pygame.Rect(0, 0, 1023, 950)
@@ -60,8 +59,8 @@ class Jeu:
         self.projectile_groupe = Group()
         self.t1, self.t2 = 0, 0
         self.delta_temps = 0
-        self.image_tir = pygame.image.load('image/tir.png').subsurface(pygame.Rect(6, 10, 17, 11))
-        self.image_joueur = pygame.image.load('image/personnage.png').convert()
+        self.image_tir = pygame.image.load('Desktop/Projet/images/tir.png').subsurface(pygame.Rect(6, 10, 17, 11))
+        self.image_joueur = pygame.image.load('Desktop/Projet/images/personnage.png').convert()
         self.platforme_groupe = Group()
         self.platforme_liste_rect = [pygame.Rect(0, 300, 300, 50), pygame.Rect(800, 300, 300, 50), pygame.Rect(400, 150, 300, 50)]
 
@@ -77,7 +76,7 @@ class Jeu:
         self.duree_invincibilite = 2  # 2 secondes d'invincibilité après un coup
 
         # Charger l'image du trophée
-        self.image_trophee = pygame.image.load('image/trophee.png').subsurface((0, 0, 500, 500))
+        self.image_trophee = pygame.image.load('Desktop/Projet/images/trophee.png').subsurface((0, 0, 500, 500))
         self.image_trophee = pygame.transform.scale(self.image_trophee, (100, 100))  # Redimensionner le trophée à une taille raisonnable
         self.trophee_position = (500, 380)  # Position en bas à droite, légèrement décalée du bord
         self.trophee_affiche = False  # Flag pour savoir si le trophée doit être affiché
@@ -96,8 +95,6 @@ class Jeu:
 
     def jouer_jump(self):
         self.son_jump.play()
-
-
 
     def spawn_ennemi(self):
         """Faire apparaître un ennemi toutes les 3 secondes, jusqu'à un total de 4 ennemis."""
@@ -234,12 +231,15 @@ class Jeu:
         dictionnaire_vide = {}
         dictionnaire_images = self.joueur.convertir_rect_surface(self.image_joueur, dictionnaire_vide)
 
-
-
         while self.jeu_encours:
             for event in pygame.event.get():
                 if event.type == pygame.QUIT:
-                    sys.exit()
+                    return self.ennemis_tues
+                if event.type == pygame.KEYDOWN:
+                    if event.key == pygame.K_ESCAPE:
+                        return self.ennemis_tues
+                if event.type == pygame.QUIT:
+                    self.jeu_encours = False
 
                 if event.type == pygame.KEYDOWN:
                     if event.key == pygame.K_d:
@@ -354,23 +354,20 @@ class Jeu:
             if self.trophee_affiche and self.joueur.rect.colliderect(self.trophee_rect):
                 # Afficher le texte d'instruction
                 font = pygame.font.Font(None, 36)  # Police par défaut, taille 36
-                texte_instruction = "Appuyez sur E pour finir le niveau"
+                texte_instruction = "Appuyez sur ECHAP pour finir le niveau"
                 surface_texte = font.render(texte_instruction, True, (255, 255, 255))  # Texte en blanc
                 x_text = self.trophee_position[0] + self.trophee_rect.width // 2 - surface_texte.get_width() // 2
                 y_text = self.trophee_position[1] - 40
                 self.ecran.blit(surface_texte, (x_text, y_text))
 
                 # Vérifier si le joueur appuie sur E
-                if event.type == pygame.KEYDOWN and event.key == pygame.K_e:
-                    self.menu()  
-
-
+                if event.type == pygame.KEYDOWN:
+                    if event.key == pygame.K_ESCAPE:
+                        return self.ennemis_tues
 
             pygame.draw.rect(self.ecran, (255, 0, 0), self.rect, 1)
-            self.horloge.tick(self.fps)
             pygame.display.flip()
-
-if __name__ == '__main__':
-    pygame.init()
-    Jeu().boucle_principale()
-    pygame.quit()
+            self.horloge.tick(self.fps)
+        
+        # Retourner le score final après la fin du niveau
+        return self.ennemis_tues  
